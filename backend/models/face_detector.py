@@ -8,6 +8,16 @@ from .model import Model
 logger = logging.getLogger(__name__)
 
 
+INDEX_CONF = 2
+INDEX_XMIN = 3
+INDEX_YMIN = 4
+INDEX_XMAN = 5
+INDEX_YMAX = 6
+INDEX_X = 1
+INDEX_Y = 0
+BLUE = (255, 0, 0)
+
+
 class FaceDetector(Model):
     def __init__(self, ie_core, model_path, device_name="CPU", num_requests=0):
         super(FaceDetector, self).__init__(
@@ -19,26 +29,19 @@ class FaceDetector(Model):
 
     def prepare_data(self, input, frame, confidence=0.5):
         data_array = []
-        index_conf = 2
-        index_xmin = 3
-        index_ymin = 4
-        index_xman = 5
-        index_ymax = 6
-        index_x = 1
-        index_y = 0
         for data in np.squeeze(input):
-            conf = data[index_conf]
+            conf = data[INDEX_CONF]
 
             # フレームからはみ出す座標を避けるため、xmin/yminは0未満にならないようにします
-            xmin = max(0, int(data[index_xmin] * frame.shape[index_x]))
-            ymin = max(0, int(data[index_ymin] * frame.shape[index_y]))
+            xmin = max(0, int(data[INDEX_XMIN] * frame.shape[INDEX_X]))
+            ymin = max(0, int(data[INDEX_YMIN] * frame.shape[INDEX_Y]))
 
             # フレーム内に収まるよう、xmax/ymaxをframeの幅/高さの範囲内に制限します
             xmax = min(
-                int(data[index_xman] * frame.shape[index_x]), frame.shape[index_x]
+                int(data[INDEX_XMAN] * frame.shape[INDEX_X]), frame.shape[INDEX_X]
             )
             ymax = min(
-                int(data[index_ymax] * frame.shape[index_y]), frame.shape[index_y]
+                int(data[INDEX_YMAX] * frame.shape[INDEX_Y]), frame.shape[INDEX_Y]
             )
             if conf > confidence:
                 area = (xmax - xmin) * (ymax - ymin)
@@ -64,13 +67,12 @@ class FaceDetector(Model):
 
     def draw(self, data_array, frame):
         dest = frame.copy()
-        blue = (255, 0, 0)
         for i, data in enumerate(data_array):
             cv.rectangle(
                 dest,
                 (int(data["xmin"]), int(data["ymin"])),
                 (int(data["xmax"]), int(data["ymax"])),
-                color=blue,
+                color=BLUE,
                 thickness=3,
             )
             logger.debug(
