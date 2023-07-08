@@ -25,33 +25,45 @@ const theme = createTheme({
 function App() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-
+  
       setLoading(true);
-
-      try {
-        const response = await fetch('http://localhost:8000/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (response.ok) {
-          const blob = await response.blob();
+  
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://localhost:8000/upload', true);
+  
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded * 100) / event.total);
+          setUploadProgress(progress);
+        }
+      };
+  
+      xhr.onload = async () => {
+        if (xhr.status === 200) {
+          const blob = xhr.response;
           const url = URL.createObjectURL(blob);
           setImageUrl(url);
         } else {
-          throw new Error('Failed to upload file');
+          console.error('Failed to upload file');
         }
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
+  
         setLoading(false);
-      }
+      };
+  
+      xhr.onerror = () => {
+        console.error('Error occurred while uploading file');
+        setLoading(false);
+      };
+  
+      xhr.responseType = 'blob'; // レスポンスの形式をBlobに設定
+      xhr.send(formData);
     }
   };
 
@@ -116,6 +128,7 @@ function App() {
                   </Typography>
                 </Button>
               </label>
+              {uploadProgress > 0 && <LinearProgress variant="determinate" value={uploadProgress} />}
             </Grid>
             <Grid item xs={12}>
               <Box
