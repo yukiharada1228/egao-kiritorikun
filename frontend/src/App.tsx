@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import { CloudUploadOutlined } from '@mui/icons-material';
+import { CloudUploadOutlined, GetAppOutlined } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#ff80ab', // プライマリカラーをピンクに変更
+      main: '#ff80ab',
     },
     secondary: {
-      main: '#5c6bc0', // セカンダリカラーを紫に変更
+      main: '#5c6bc0',
     },
   },
   typography: {
-    fontFamily: "'Kosugi Maru', sans-serif", // フォントを'Kosugi Maru'に変更
+    fontFamily: "'Kosugi Maru', sans-serif",
   },
 });
 
@@ -54,11 +55,25 @@ function App() {
     }
   };
 
+  const handleDownload = () => {
+    if (imageUrl) {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = 'processed_image.jpg';
+      link.target = '_blank';
+  
+      document.body.appendChild(link);
+      link.click();
+  
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          backgroundImage: 'url("https://example.com/background-image.jpg")', // 背景画像を指定
+          backgroundImage: 'url("https://example.com/background-image.jpg")',
           backgroundSize: 'cover',
           minHeight: '100vh',
           display: 'flex',
@@ -66,9 +81,17 @@ function App() {
           alignItems: 'center',
         }}
       >
-        <Box sx={{ p: 2, backgroundColor: 'rgba(0, 0, 0, 0.8)', borderRadius: '10px', maxWidth: '600px', width: '100%' }}>
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12} sm={6}>
+        <Box
+          sx={{
+            p: 2,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderRadius: '10px',
+            maxWidth: '800px',
+            width: '100%',
+          }}
+        >
+          <Grid container spacing={2} justifyContent="space-around">
+            <Grid item xs={12}>
               <label htmlFor="upload-input">
                 <input type="file" accept="video/*" onChange={handleFileChange} style={{ display: 'none' }} id="upload-input" />
                 <Button
@@ -76,15 +99,16 @@ function App() {
                   component="span"
                   startIcon={<CloudUploadOutlined />}
                   sx={{
-                    borderRadius: '30px', // ボタンの角丸を変更
+                    borderRadius: '30px',
                     backgroundColor: theme.palette.primary.main,
                     color: '#fff',
                     '&:hover': {
                       backgroundColor: theme.palette.secondary.main,
                     },
-                    whiteSpace: 'normal', // ボタン内のテキストの折り返しを有効にする
-                    overflow: 'hidden', // ボタン内の要素がはみ出た場合に非表示にする
-                    padding: '10px', // ボタン内の余白を追加
+                    whiteSpace: 'normal',
+                    overflow: 'hidden',
+                    padding: '10px',
+                    width: '100%',
                   }}
                 >
                   <Typography variant="body1" sx={{ maxWidth: '100%', overflowWrap: 'break-word' }}>
@@ -93,11 +117,15 @@ function App() {
                 </Button>
               </label>
             </Grid>
-            <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Grid item xs={12}>
               <Box
                 sx={{
-                  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)', // 影を追加
-                  borderRadius: '10px', // 画像の角丸を変更
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flexDirection: 'column',
+                  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+                  borderRadius: '10px',
                   overflow: 'hidden',
                   width: '100%',
                 }}
@@ -113,21 +141,31 @@ function App() {
                       alt="Processed Image"
                       style={{
                         width: '100%',
-                        objectFit: 'cover', // 画像のアスペクト比を維持
+                        objectFit: 'cover',
                       }}
                     />
-                    <Box
+                    <Button
+                      variant="contained"
+                      startIcon={<GetAppOutlined />}
+                      onClick={handleDownload}
                       sx={{
-                        backgroundColor: theme.palette.primary.main,
+                        borderRadius: '30px',
+                        backgroundColor: theme.palette.secondary.main,
                         color: '#fff',
-                        padding: '8px',
-                        textAlign: 'center',
+                        '&:hover': {
+                          backgroundColor: theme.palette.primary.main,
+                        },
+                        whiteSpace: 'normal',
+                        overflow: 'hidden',
+                        padding: '10px',
+                        marginTop: '10px',
+                        width: '100%',
                       }}
                     >
-                      <Typography variant="body1" sx={{ overflowWrap: 'break-word' }}>
-                        Processed Image
+                      <Typography variant="body1" sx={{ maxWidth: '100%', overflowWrap: 'break-word' }}>
+                        Download File
                       </Typography>
-                    </Box>
+                    </Button>
                   </Box>
                 ) : (
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px' }}>

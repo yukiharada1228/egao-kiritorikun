@@ -14,7 +14,7 @@ from starlette.responses import FileResponse
 
 from models import EmotionsRecognizer, FaceDetector
 
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 logger = logging.getLogger(__name__)
 
 
