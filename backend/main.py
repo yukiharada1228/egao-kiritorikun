@@ -7,6 +7,7 @@ from pathlib import Path
 import cv2
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from openvino.inference_engine import IECore
 from starlette.responses import FileResponse
@@ -37,6 +38,18 @@ emotions_recognizer = EmotionsRecognizer(
 )
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # すべてのオリジンを許可する場合は、["*"]を使用します
+    allow_methods=["*"],  # すべてのHTTPメソッドを許可する場合は、["*"]を使用します
+    allow_headers=["*"],  # すべてのヘッダーを許可する場合は、["*"]を使用します
+)
+
+
+@app.get("/")
+def read_root():
+    return {"smile": "きりとり君"}
 
 
 @app.post("/upload")
