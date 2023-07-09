@@ -90,7 +90,7 @@ function App() {
           alt="Processed Image"
           style={{
             width: '100%',
-            maxHeight: '100%',
+            maxHeight: innerHeight * 0.75,
             objectFit: 'contain',
           }}
         />
