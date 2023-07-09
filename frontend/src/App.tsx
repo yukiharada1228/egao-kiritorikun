@@ -32,19 +32,19 @@ function App() {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-  
+
       setLoading(true);
-  
+
       const xhr = new XMLHttpRequest();
       xhr.open('POST', 'http://localhost:8000/upload', true);
-  
+
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
           const progress = Math.round((event.loaded * 100) / event.total);
           setUploadProgress(progress);
         }
       };
-  
+
       xhr.onload = async () => {
         if (xhr.status === 200) {
           const blob = xhr.response;
@@ -53,16 +53,16 @@ function App() {
         } else {
           console.error('Failed to upload file');
         }
-  
+
         setLoading(false);
       };
-  
+
       xhr.onerror = () => {
         console.error('Error occurred while uploading file');
         setLoading(false);
       };
-  
-      xhr.responseType = 'blob'; // レスポンスの形式をBlobに設定
+
+      xhr.responseType = 'blob';
       xhr.send(formData);
     }
   };
@@ -73,13 +73,60 @@ function App() {
       link.href = imageUrl;
       link.download = 'processed_image.jpg';
       link.target = '_blank';
-  
+
       document.body.appendChild(link);
       link.click();
-  
+
       document.body.removeChild(link);
     }
   };
+
+  let content;
+  if (imageUrl) {
+    content = (
+      <Box sx={{ maxHeight: '100%' }}>
+        <img
+          src={imageUrl}
+          alt="Processed Image"
+          style={{
+            width: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+          }}
+        />
+        <Button
+          variant="contained"
+          startIcon={<GetAppOutlined />}
+          onClick={handleDownload}
+          sx={{
+            borderRadius: '30px',
+            backgroundColor: theme.palette.secondary.main,
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: theme.palette.primary.main,
+            },
+            whiteSpace: 'normal',
+            overflow: 'hidden',
+            padding: '10px',
+            marginTop: '10px',
+            width: '100%',
+          }}
+        >
+          <Typography variant="body1" sx={{ maxWidth: '100%', overflowWrap: 'break-word' }}>
+            Download File
+          </Typography>
+        </Button>
+      </Box>
+    );
+  } else {
+    content = (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px' }}>
+        <Typography variant="body1" sx={{ color: theme.palette.primary.main }}>
+          No file uploaded
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -147,45 +194,8 @@ function App() {
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px', width: '100%' }}>
                     <CircularProgress sx={{ color: theme.palette.secondary.main }} />
                   </Box>
-                ) : imageUrl ? (
-                  <Box>
-                    <img
-                      src={imageUrl}
-                      alt="Processed Image"
-                      style={{
-                        width: '100%',
-                        objectFit: 'cover',
-                      }}
-                    />
-                    <Button
-                      variant="contained"
-                      startIcon={<GetAppOutlined />}
-                      onClick={handleDownload}
-                      sx={{
-                        borderRadius: '30px',
-                        backgroundColor: theme.palette.secondary.main,
-                        color: '#fff',
-                        '&:hover': {
-                          backgroundColor: theme.palette.primary.main,
-                        },
-                        whiteSpace: 'normal',
-                        overflow: 'hidden',
-                        padding: '10px',
-                        marginTop: '10px',
-                        width: '100%',
-                      }}
-                    >
-                      <Typography variant="body1" sx={{ maxWidth: '100%', overflowWrap: 'break-word' }}>
-                        Download File
-                      </Typography>
-                    </Button>
-                  </Box>
                 ) : (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px' }}>
-                    <Typography variant="body1" sx={{ color: theme.palette.primary.main }}>
-                      No file uploaded
-                    </Typography>
-                  </Box>
+                  content
                 )}
               </Box>
             </Grid>
